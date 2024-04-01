@@ -1,5 +1,4 @@
 import { defineConfig, type DefaultTheme } from "vitepress"
-import { otherChannel } from "./otherChannel"
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -13,7 +12,9 @@ export default defineConfig({
     nav: nav(),
     // 最多嵌套六级
     sidebar: {
-      "/src/FrontEnd/": { base: "/src/FrontEnd/", items: sidebarFrontEnd() },
+      "/FrontEnd/": { base: "/FrontEnd/", items: sidebarFrontEnd() },
+      "/BackEnd/": { base: "/BackEnd/", items: sidebarBackEnd() },
+      "/Tools/": { base: "/Tools/", items: sidebarTools() },
     },
 
     socialLinks: [
@@ -45,7 +46,7 @@ export default defineConfig({
   //     // md.use(markdownItFoo)
   //   },
   // },
-  // srcDir: "src",
+  srcDir: "src",
   // outDir: "public",
   // assetsDir: "static",
   // // cacheDir: './cache'
@@ -54,8 +55,18 @@ function nav(): DefaultTheme.NavItem[] {
   return [
     {
       text: "前端",
-      link: "/src/FrontEnd/index",
-      activeMatch: "/src/FrontEnd/",
+      link: "/FrontEnd/index",
+      activeMatch: "/FrontEnd/",
+    },
+    {
+      text: "后端",
+      link: "/BackEnd/index",
+      activeMatch: "/BackEnd/",
+    },
+    {
+      text: "工具",
+      link: "/Tools/index",
+      activeMatch: "/Tools/",
     },
   ]
 }
@@ -80,5 +91,35 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
       ],
     },
     // ...
+  ]
+}
+
+function sidebarBackEnd(): DefaultTheme.SidebarItem[] {
+  return [
+    {
+      text: "Java",
+      collapsed: false,
+      items: [],
+    },
+    {
+      text: "NodeJS",
+      collapsed: false,
+      items: [],
+    },
+  ]
+}
+
+function sidebarTools(): DefaultTheme.SidebarItem[] {
+  return [
+    {
+      text: "Git",
+      collapsed: false,
+      items: [
+        {
+          text: "SSH链接本地与远程仓库",
+          link: "/Git/localLinkRemotesBySSH.md",
+        },
+      ],
+    },
   ]
 }
