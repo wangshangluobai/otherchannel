@@ -76,6 +76,7 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
     {
       text: "JavaScript",
       collapsed: false,
+      link: "/JavaScript/",
       items: [
         {
           text: "常用语法集",
@@ -88,6 +89,31 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
         { text: "React", link: "/JavaScript/React/" },
         { text: "Vue", link: "/JavaScript/Vue/" },
         { text: "Angular", link: "/JavaScript/Angular/" },
+      ],
+    },
+    {
+      text: "NPM",
+      collapsed: false,
+      link: "/NodePackageManager/",
+      items: [
+        {
+          text: "NVM",
+          link: "/NodePackageManager/NodejsVersionManagement/",
+        },
+        {
+          text: "pnpm",
+          link: "/NodePackageManager/pnpm/",
+        },
+        {
+          text: "yarn",
+          link: "/NodePackageManager/yarn/",
+          items: [
+            {
+              text: "安装依赖网路报错",
+              link: "/NodePackageManager/yarn/installThrowError",
+            },
+          ],
+        },
       ],
     },
     // ...
@@ -105,6 +131,23 @@ function sidebarBackEnd(): DefaultTheme.SidebarItem[] {
       text: "NodeJS",
       collapsed: false,
       items: [],
+    },
+    {
+      text: "My Batis-Plus",
+      collapsed: false,
+      link: "/MyBatis-Plus/",
+      items: [],
+    },
+    {
+      text: "SQL",
+      collapsed: false,
+      link: "/StructuredQueryLanguage/",
+      items: [
+        {
+          text: "不同数据库语法差异",
+          link: "/StructuredQueryLanguage/DiffDatabases",
+        },
+      ],
     },
   ]
 }

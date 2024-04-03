@@ -1,40 +1,56 @@
 ### 常用命令
 
 ```sh
-$ npm help # 查看 npm 命令列表
-$ npm -l # 查看各个命令的简单用法
-$ npm -v # 查看 npm 的版本
-$ npm config list -l # 查看 npm 的配置
-$ npm list [package name] # 命令以树型结构列出当前项目安装的所有模块，以及它们依赖的模块
-$ npm list -global # 加上 global 参数，会列出全局安装的模块
-$ npm info # 命令可以查看每个模块的具体信息
-$ npm search <搜索词> # 命令用于搜索 npm 仓库，它后面可以跟字符串，也可以跟正则表达式
+$ npm init
+# 初始化项目 生成相关文件
+
+$ npm help
+# 查看 npm 命令列表
+
+$ npm config list -l
+# 查看 npm 的配置
+
+$ npm info
+# 命令可以查看每个模块的具体信息
+
+$ npm search <search keyword>
+# 命令用于搜索 npm 仓库，它后面可以跟字符串，也可以跟正则表达式
+
+$ npm update <package name>
+# 命令用于更新本地安装的模块
+
+$ npm uninstall <package name>
+# 命令用于卸载已安装的模块
+
+$ npm root
+# 命令用于查看 node_modules 的路径
+
+$ npm config set registry
+# 命令用于设置 npm 远程仓库地址
+
+$ npm dedupe
+# 命令用于合并重复的依赖模块
+
+$ npm audit
+# 命令用于查看依赖模块的漏洞
+
+$ npm cache clean
+# 命令用于清除缓存
+
 ```
 
-$ npm search
+### 相关文件功能
 
-npm update
+- `package.json` 项目包管理文件
+- `node_modules` 项目依赖模块
+- `package-lock.json` 项目依赖模块版本锁定文件
 
-npm update 命令可以更新本地安装的模块
+### 命令参数及简写
 
-# 升级当前项目的指定模块
-
-$ npm update [package name]
-
-# 升级全局安装的模块
-
-$ npm update -global [package name]
-
-npm uninstall
-
-npm uninstall 命令，卸载已安装的模块
-
-$ npm uninstall [package name]
-
-# 卸载全局模块
-
-$ npm uninstall [package name] -global
-
-```
-
-```
+- install (i) 安装模块
+- global (-g) 全局安装模块
+- save (-S) 保存模块到 `package.json`
+- save-dev (-D) 保存模块到 `package.json` 中的 `devDependencies`
+- version (-v) 查看版本
+- list (-l) 列出模块
+- -yes (-y) 自动确认安装
