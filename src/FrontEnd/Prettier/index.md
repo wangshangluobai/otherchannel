@@ -206,6 +206,37 @@ Vue files script and style tags indentation(vue 文件中 script 和 style 标�
   - `true`: 缩进 Vue 文件中的脚本和样式标签
   - `false`: 不要在 Vue 文件中缩进脚本和样式标签
 
+End of Line(行尾符)
+系统使用的换行方式
+
+- 可选项
+  - 默认值 `lf`
+  - `lf`: 使用 Linux 风格的换行符 (\n)
+  - `crlf`: 使用 Windows 风格的换行符 (\r\n)
+  - `cr`: (\r)
+  - "auto": 使用与操作系统相同的换行符
+- Api 配置
+  endOfLine: "<lf|crlf|cr|auto>"
+
+Embedded Language Formatting(嵌入语言格式化)
+例如 Vue 的单文件组件中，HTML、CSS、JS 进行不同的格式化方式
+
+- 可选项
+  - 默认值 `auto`
+  - `auto`: 根据文件类型自动格式化
+  - `off`: 关闭嵌入语言格式化
+- Api 配置
+  embeddedLanguageFormatting: "<auto|off>"
+
+Single Attribute Per Line(JSX | Vue 每个属性单独一行)
+
+- 可选项
+  - 默认值 `false`
+  - `true`: 每个属性单独一行
+  - `false`: 不每个属性单独一行
+- Api 配置
+  singleAttributePerLine: "<true|false>"
+
 ### 相关链接
 
 - [Prettier 官网](https://www.prettier.cn/)
