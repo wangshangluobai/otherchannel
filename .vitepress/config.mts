@@ -72,6 +72,8 @@ function nav(): DefaultTheme.NavItem[] {
 }
 
 function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
+  // const res = await import.meta
+  // console.log(111, res)
   return [
     {
       text: "JavaScript",
@@ -87,7 +89,16 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
           link: "/JavaScript/AdvancedSyntax/",
         },
         { text: "React", link: "/JavaScript/React/" },
-        { text: "Vue", link: "/JavaScript/Vue/" },
+        {
+          text: "Vue",
+          link: "/JavaScript/Vue/",
+          items: [
+            {
+              text: "性能优化",
+              link: "/JavaScript/Vue/VueApplicationPerformanceOptimization",
+            },
+          ],
+        },
         { text: "Angular", link: "/JavaScript/Angular/" },
       ],
     },
@@ -115,6 +126,10 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
           ],
         },
       ],
+    },
+    {
+      text: "Prettier",
+      link: "/Prettier/",
     },
     // ...
   ]
@@ -160,7 +175,17 @@ function sidebarTools(): DefaultTheme.SidebarItem[] {
       items: [
         {
           text: "SSH链接本地与远程仓库",
-          link: "/Git/localLinkRemotesBySSH.md",
+          link: "/Git/localLinkRemotesBySSH",
+        },
+      ],
+    },
+    {
+      text: "网站书签",
+      collapsed: false,
+      items: [
+        {
+          text: "技术文档",
+          link: "/Bookmark/Docs",
         },
       ],
     },
