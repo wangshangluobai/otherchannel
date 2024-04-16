@@ -88,6 +88,16 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
           text: "高级语法集",
           link: "/JavaScript/AdvancedSyntax/",
         },
+        {
+          text: "Library",
+          link: "",
+          items: [
+            {
+              text: "normalizr",
+              link: "/JavaScript/Library/normalizr"
+            }
+          ],
+        },
         { text: "React", link: "/JavaScript/React/" },
         {
           text: "Vue",
