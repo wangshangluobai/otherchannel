@@ -19,19 +19,95 @@
 ### schema对象属性
 
 - `Array`：数组类型，用于处理数组类型的数据，通常与其它schema类型（如Entity、Object等）结合使用，表示数组中每个元素的结构。Array接受一个子schema作为参数，用于解析数组中的每个元素。
-- `Entity`：实体类型，用于处理对象类型的数据，用于描述具有唯一标识符的实体类型。接三个参数：
-  - `entityName`：实体的名称，用于标识数据中的特定类型。
-  - `definition`（可选）：一个对象，定义实体内部的属性及其对应的子schema。用于描述实体间的关联关系。
-  - `options`（可选）：一个对象，包含如 `idAttribute` 等配置选项。
 
 
 - `Values`：值类型，用于处理对象类型的数据
 
-#### 注意事项：
 
-- 使用 `Entity` 创建实体时，需要指定 `idAttribute` 等属性时，需要完全定义 `Entity` 中的三个参数，它没有额外的参数处理。或许之后可以考虑优化，*添加参数重载*功能。
-- 使用 `new schema.Object({key: String})` 这种类型定义是无效的 normalize是不会改变源数据 值数据类型的
-- `Union` 可以拥有很多 `schema`，这些 `schema` 可以是任意类型的，这些 `schema` 会根据 `schemaAttribute` 属性来判断数据类型。如果 `schemaAttribute` 对应的值不存在，则使生成的数据不会创建实体，且会将原始数据直接返回。如果对应的值存在，则根据对应的 `schema` 生成数实体。
+
+## `schema`
+
+### `Array(definition, schemaAttribute)`
+
+创建一个架构以规范化架构数组。如果输入值是“Object”而不是“Array”，则归一化结果将是一个 `Object` 其值为 `Array`。 
+
+_注意: 简写: `[ mySchema ]`_
+
+- `definition`: **required** 此数组包含的单一模式或模式到属性值的映射 
+- `schemaAttribute`: _optional_ (如果 `definition` 不是单一模式则该参数必须) 找到的每个实体上的属性，根据定义映射定义规范化时要使用的模式。
+  可以是字符串或函数，如果定义为函数则拥有以下参数:  
+  _ `value`: 输入的实体
+  _ `parent`: The parent object of the input array. \* `key`: The key at which the input array appears on the parent object.
+
+#### Instance Methods
+
+- `define(definition)`: When used, the `definition` passed in will be merged with the original definition passed to the `Array` constructor. This method tends to be useful for creating circular references in schema.
+
+#### Usage
+
+To describe a simple array of a singular entity type:
+
+```js
+const data = [{ id: '123', name: 'Jim' }, { id: '456', name: 'Jane' }];
+const userSchema = new schema.Entity('users');
+
+const userListSchema = new schema.Array(userSchema);
+// or use shorthand syntax:
+const userListSchema = [userSchema];
+
+const normalizedData = normalize(data, userListSchema);
+```
+
+#### Output
+
+```js
+{
+  entities: {
+    users: {
+      '123': { id: '123', name: 'Jim' },
+      '456': { id: '456', name: 'Jane' }
+    }
+  },
+  result: [ '123', '456' ]
+}
+```
+
+If your input data is an array of more than one type of entity, it is necessary to define a schema mapping.
+
+_Note: If your data returns an object that you did not provide a mapping for, the original object will be returned in the result and an entity will not be created._
+
+For example:
+
+```js
+const data = [{ id: 1, type: 'admin' }, { id: 2, type: 'user' }];
+
+const userSchema = new schema.Entity('users');
+const adminSchema = new schema.Entity('admins');
+const myArray = new schema.Array(
+  {
+    admins: adminSchema,
+    users: userSchema
+  },
+  (input, parent, key) => `${input.type}s`
+);
+
+const normalizedData = normalize(data, myArray);
+```
+
+#### Output
+
+```js
+{
+  entities: {
+    admins: { '1': { id: 1, type: 'admin' } },
+    users: { '2': { id: 2, type: 'user' } }
+  },
+  result: [
+    { id: 1, schema: 'admins' },
+    { id: 2, schema: 'users' }
+  ]
+}
+```
 
 
 ### `Entity(key, definition = {}, options = {})` 实体类型
@@ -42,20 +118,20 @@
 - `options`:
   - `idAttribute`: 每个实体类型的唯一标识属性
     接受字符串类型 或 返回唯一标识的函数类型，_注意: 函数可多次运行，但每次运行生成的ID都是相同的，使用随机数会导致错误。_
-    如果是函数,则*有序*接受以下参数 :
+    如果定义为函数, 该函数参数依次为:
     - `value`: 输入的实体
     - `parent`: 输入数组的父对象
     - `key`: 输入数组显示在父对象上的键
-  - `mergeStrategy(entityA, entityB)`: Strategy to use when merging two entities with the same `id` value. Defaults to merge the more recently found entity onto the previous.
-  - `processStrategy(value, parent, key)`: Strategy to use when pre-processing the entity. Use this method to add extra data, defaults, and/or completely change the entity before normalization is complete. Defaults to returning a shallow copy of the input entity.  
-    _Note: It is recommended to always return a copy of your input and not modify the original._  
-    The function accepts the following arguments, in order:
-    - `value`: The input value of the entity.
-    - `parent`: The parent object of the input array.
-    - `key`: The key at which the input array appears on the parent object.
-  - `fallbackStrategy(key, schema)`: Strategy to use when denormalizing data structures with id references to missing entities.
-    - `key`: The key at which the input array appears on the parent object.
-    - `schema`: The schema of the missing entity
+  - `mergeStrategy(entityA, entityB)`: 合并具有相同id值的两个实体时使用的函数。默认情况下，将最近找到的实体合并到上一个实体上。
+  - `processStrategy(value, parent, key)`: 预处理实体时使用的函数。使用此方法可以添加额外的数据、默认值和/或在规范化完成之前完全更改实体。默认为返回输入实体的浅复制。  
+    _注意: 建议始终返回输入的副本，而不要修改原始输入。_  
+    该函数的参数依次为:
+    - `value`: 输入的实体
+    - `parent`: 输入数组的父对象
+    - `key`: 输入数组显示在父对象上的键
+  - `fallbackStrategy(key, schema)`: 在对id引用为缺失实体的数据结构进行反规范化时使用的策略。Strategy to use when denormalizing data structures with id references to missing entities.
+    - `key`: 父对象的键，对应的值是输入的实体数据
+    - `schema`: 没有实体的模式
 
 #### Instance Methods
 
@@ -63,8 +139,8 @@
 
 #### Instance Attributes
 
-- `key`: Returns the key provided to the constructor.
-- `idAttribute`: Returns the idAttribute provided to the constructor in options.
+- `key`: 提供给构造函数的键 
+- `idAttribute`: 在选项中提供给构造函数的 `idAttribute` 。
 
 #### Usage
 
@@ -77,16 +153,21 @@ const tweet = new schema.Entity(
   { user: user },
   {
     idAttribute: 'id_str',
-    // Apply everything from entityB over entityA, except for "favorites"
+    // 合并策略 实体A和实体B的所有内容都保留，特殊字段 如两者共有的数据则在下面单独定义，就是解构赋值语法
     mergeStrategy: (entityA, entityB) => ({
       ...entityA,
       ...entityB,
       favorites: entityA.favorites
     }),
-    // Remove the URL field from the entity
+    // 从实体上移除 URL 字段
     processStrategy: (entity) => omit(entity, 'url')
   }
 );
+
+function omit(entity, key) {
+  delete entity[key];
+  return entity;
+}
 
 const normalizedData = normalize(data, tweet);
 ```
@@ -105,15 +186,15 @@ const normalizedData = normalize(data, tweet);
 
 #### `idAttribute` Usage
 
-When passing the `idAttribute` a function, it should return the IDs value.
+当传递 `idAttribute` 是一个函数，它应该返回ID的值。
 
-For Example:
+举个栗子:
 
 ```js
 const data = [{ id: '1', guest_id: null, name: 'Esther' }, { id: '1', guest_id: '22', name: 'Tom' }];
 
 const patronsSchema = new schema.Entity('patrons', undefined, {
-  // idAttribute *functions* must return the ids **value** (not key)
+  // idAttribute 是函数时，必须返回ID的值，而不是key
   idAttribute: (value) => (value.guest_id ? `${value.id}-${value.guest_id}` : value.id)
 });
 
@@ -134,7 +215,7 @@ normalize(data, [patronsSchema]);
 }
 ```
 
-#### `fallbackStrategy` Usage
+#### `fallbackStrategy` 示例
 ```js
 const users = {
   '1': { id: '1', name: "Emily", requestState: 'SUCCEEDED' },
@@ -147,6 +228,7 @@ const books = {
 };
 
 const authorSchema = new schema.Entity('authors', {}, {
+  // 去规范化时，缺失实体时使用此策略构建实体
   fallbackStrategy: (key, schema) => {
     return {
       [schema.idAttribute]: key,
@@ -231,7 +313,7 @@ const normalizedData = normalize(sampleData, userSchema);
 
 - `definition`: **required** key为实体中 `schemaAttribute` 属性的值，value为该实体的模式
 - `schemaAttribute`: **required** 每个实体定义的模式都存在该属性, 根据不同的属性值，使用不同的模式
-  可以是 `String` 或 `Function`。 如果定义为函数, 该函数有三个参数:
+  可以是 `String` 或 `Function`。 如果定义为函数, 该函数参数依次为:
   - `value`: 输入的实体
   - `parent`: 输入数组的父对象
   - `key`: 输入数组显示在父对象上的键
@@ -352,6 +434,14 @@ const normalizedData = normalize(sampleData, {
 
 
 
+
+
+
+## 注意事项：
+
+- 使用 `Entity` 创建实体时，需要指定 `idAttribute` 等属性时，需要完全定义 `Entity` 中的三个参数，它没有额外的参数处理。或许之后可以考虑优化，*添加参数重载*功能。
+- 使用 `new schema.Object({key: String})` 这种类型定义是无效的 normalize是不会改变源数据 值数据类型的
+- `Union` 可以拥有很多 `schema`，这些 `schema` 可以是任意类型的，这些 `schema` 会根据 `schemaAttribute` 属性来判断数据类型。如果 `schemaAttribute` 对应的值不存在，则使生成的数据不会创建实体，且会将原始数据直接返回。如果对应的值存在，则根据对应的 `schema` 生成数实体。
 
 
 # 参考文章
