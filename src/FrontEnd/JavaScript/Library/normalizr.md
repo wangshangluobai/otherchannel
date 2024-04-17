@@ -2,42 +2,97 @@
 # normalizr 数据转换
   `normalizr` 创立的初衷是处理深层，复杂的嵌套的对象。
 
+- 使用命名导入：`import { normalize, denormalize, schema } from 'normalizr';`
 
-### 基础理解
+# API
 
-- 使用命名导入：`import { normalize, schema } from 'normalizr';`
+- [normalize](#normalizedata-schema)
+- [denormalize](#denormalizeinput-schema-entities)
+- [schema](#schema)
+  - [Array](#arraydefinition-schemaattribute)
+  - [Entity](#entitykey-definition---options--)
+  - [Object](#objectdefinition)
+  - [Union](#uniondefinition-schemaattribute)
+  - [Values](#valuesdefinition-schemaattribute)
+
+## `normalize(data, schema)`
+
+根据输入的数据和模式进行归一化
+
+- `data`: **required** 输入需要归一化的数据，支持 JSON 或者 JS 对象
+- `schema`: **required** 模式定义
+
+### Usage
+
+```js
+import { normalize, schema } from 'normalizr';
+
+const myData = { users: [{ id: 1 }, { id: 2 }] };
+const user = new schema.Entity('users');
+const mySchema = { users: [user] };
+const normalizedData = normalize(myData, mySchema);
+```
+
+### Output
+
+```js
+{
+  result: { users: [ 1, 2 ] },
+  entities: {
+    users: {
+      '1': { id: 1 },
+      '2': { id: 2 }
+    }
+  }
+}
+```
+
+## `denormalize(input, schema, entities)` 去归一化
+
+基于模式和普通对象或不可变数据中提供的实体来去归一化，和 `normalize` 相反。
+
+_特别注意:_ 小心使用去归一化， 过早地将数据恢复为大型嵌套对象可能会影响React（和其他）应用程序的性能
+
+如果模式存在递归引用，则只会给出实体的第一个实例。后续引用将返回提供的`id`。
+
+- `input`: **required** 归一化输出的结果可以被去归一化， 通常与 `normalize` 输出的 `result` 中对应的值相同
+- `schema`: **required** 用于获取 `input` 值的*模式*定义。
+- `entities`: **required**  一个对象，由可能出现在去归一化输出中的实体架构名称键控。也接受具有不可变数据的对象。常是归一化生成的实体
+
+### Usage
 
 
-  - `normalize`：功能-将数据格式化成 `normalized` 格式
-    - 类型：[function]
-    - 参数：源数据，schema(实体/模型)
-  - `schema`：生成实体(模型)的函数集
-    - 类型：[object]
-    - 属性：Array, Entity, Object, Union, Values
+```js
+import { denormalize, schema } from 'normalizr';
 
+const user = new schema.Entity('users');
+const mySchema = { users: [user] };
+const entities = { users: { '1': { id: 1 }, '2': { id: 2 } } };
+const denormalizedData = denormalize({ users: [1, 2] }, mySchema, entities);
+```
 
-### schema对象属性
+### Output
 
-- `Array`：数组类型，用于处理数组类型的数据，通常与其它schema类型（如Entity、Object等）结合使用，表示数组中每个元素的结构。Array接受一个子schema作为参数，用于解析数组中的每个元素。
-
-
-- `Values`：值类型，用于处理对象类型的数据
-
-
+```js
+{
+  users: [{ id: 1 }, { id: 2 }];
+}
+```
 
 ## `schema`
 
 ### `Array(definition, schemaAttribute)`
 
-创建一个架构以规范化架构数组。如果输入值是“Object”而不是“Array”，则归一化结果将是一个 `Object` 其值为 `Array`。 
+创建一个架构以规范化架构数组。如果输入值是 `Object` 而不是 `Array` ，则归一化结果将是一个 `Object` 其值为 `Array`。 
 
 _注意: 简写: `[ mySchema ]`_
 
 - `definition`: **required** 此数组包含的单一模式或模式到属性值的映射 
 - `schemaAttribute`: _optional_ (如果 `definition` 不是单一模式则该参数必须) 找到的每个实体上的属性，根据定义映射定义规范化时要使用的模式。
-  可以是字符串或函数，如果定义为函数则拥有以下参数:  
+  可以是字符串或函数，如果定义为函数则拥有以下有序参数:  
   _ `value`: 输入的实体
-  _ `parent`: The parent object of the input array. \* `key`: The key at which the input array appears on the parent object.
+  _ `parent`: 输入实体的父级
+  _ `key`: 输入数组显示在父对象上的键
 
 #### Instance Methods
 
@@ -45,14 +100,14 @@ _注意: 简写: `[ mySchema ]`_
 
 #### Usage
 
-To describe a simple array of a singular entity type:
+定义一个单一实体类型的简单数组：
 
 ```js
 const data = [{ id: '123', name: 'Jim' }, { id: '456', name: 'Jane' }];
 const userSchema = new schema.Entity('users');
 
 const userListSchema = new schema.Array(userSchema);
-// or use shorthand syntax:
+// 简写:
 const userListSchema = [userSchema];
 
 const normalizedData = normalize(data, userListSchema);
@@ -72,11 +127,11 @@ const normalizedData = normalize(data, userListSchema);
 }
 ```
 
-If your input data is an array of more than one type of entity, it is necessary to define a schema mapping.
+如果输入的数据是一个包含多个实体类型的数组，则需要定义一个模型映射。
 
-_Note: If your data returns an object that you did not provide a mapping for, the original object will be returned in the result and an entity will not be created._
+_注意: 如果返回值中不存在实体，只包含原始对象，则代表提供的模型映射和输入的数据没有关联_
 
-For example:
+举个粒子:
 
 ```js
 const data = [{ id: 1, type: 'admin' }, { id: 2, type: 'user' }];
@@ -88,7 +143,19 @@ const myArray = new schema.Array(
     admins: adminSchema,
     users: userSchema
   },
-  (input, parent, key) => `${input.type}s`
+  // `schemaAttribute` 是一个函数时，返回值就是 `schemaAttribute` 实体的键名
+  // (input, parent, key) => `${input.type}s`
+  (input, parent, key) => {
+    console.log(
+      '%c [ input, parent, key ]-444',
+      'font-size:13px; background:#0b4f3b; color:#4f937f;',
+      input,
+      parent,
+      key,
+    );
+
+    return `${input.type}s`;
+  },
 );
 
 const normalizedData = normalize(data, myArray);
@@ -97,6 +164,26 @@ const normalizedData = normalize(data, myArray);
 #### Output
 
 ```js
+// [ input, parent, key ]-444
+// input
+{
+  id: 1,
+  type: 'admin'
+}
+// parent
+[
+  {
+    id: 1,
+    type: 'admin'
+  },
+  {
+    id: 2,
+    type: 'user'
+  }
+]
+// key
+null
+// normalizedData
 {
   entities: {
     admins: { '1': { id: 1, type: 'admin' } },
@@ -431,11 +518,84 @@ const normalizedData = normalize(sampleData, {
 }
 ```
 
+### `Values(definition, schemaAttribute)` 值类型
 
+定义一个映射类型，其值遵循给定的模式。
 
+- `definition`: **required** 此数组包含的单一模式或模式到属性值的映射
+- `schemaAttribute`: _optional_ (如果 `definition` 不是单一模式则该参数必须) 找到的每个实体上的属性，根据定义映射定义规范化时要使用的模式。
+  可以是字符串或函数，如果定义为函数则拥有以下有序参数:
+  - `value`: 输入的实体
+  - `parent`: 输入实体的父级
+  - `key`: 输入数组显示在父对象上的键
 
+#### Instance Methods
 
+- `define(definition)`: When used, the `definition` passed in will be merged with the original definition passed to the `Values` constructor. This method tends to be useful for creating circular references in schema.
 
+#### Usage
+
+```js
+const data = { firstThing: { id: 1 }, secondThing: { id: 2 } };
+
+const item = new schema.Entity('items');
+// 这里取的id键是库中默认指定的 如果需要修改，要针对这个实体定义options，在其中定义唯一键 idAttribute
+// const item = new schema.Entity('items', {}, { idAttribute: 'idStr' });
+const valuesSchema = new schema.Values(item);
+
+const normalizedData = normalize(data, valuesSchema);
+```
+
+#### Output
+
+```js
+{
+  entities: {
+    items: { '1': { id: 1 }, '2': { id: 2 } }
+  },
+  result: { firstThing: 1, secondThing: 2 }
+}
+```
+
+如果输入数据是一个具有多个实体类型值的对象，但它们的模式不便单纯使用键定义，则可以使用模式映射，如`schema.Union` 或 `schema.Array`
+
+_注意: 如果返回值中不存在实体，只包含原始对象，则代表提供的模型映射和输入的数据没有关联_
+
+举个栗子:
+
+```js
+const data = {
+  '1': { id: 1, type: 'admin' },
+  '2': { id: 2, type: 'user' }
+};
+
+const userSchema = new schema.Entity('users');
+const adminSchema = new schema.Entity('admins');
+const valuesSchema = new schema.Values(
+  {
+    admins: adminSchema,
+    users: userSchema
+  },
+  (input, parent, key) => `${input.type}s`
+);
+
+const normalizedData = normalize(data, valuesSchema);
+```
+
+#### Output
+
+```js
+{
+  entities: {
+    admins: { '1': { id: 1, type: 'admin' } },
+    users: { '2': { id: 2, type: 'user' } }
+  },
+  result: {
+    '1': { id: 1, schema: 'admins' },
+    '2': { id: 2, schema: 'users' }
+  }
+}
+```
 
 ## 注意事项：
 
@@ -444,7 +604,7 @@ const normalizedData = normalize(sampleData, {
 - `Union` 可以拥有很多 `schema`，这些 `schema` 可以是任意类型的，这些 `schema` 会根据 `schemaAttribute` 属性来判断数据类型。如果 `schemaAttribute` 对应的值不存在，则使生成的数据不会创建实体，且会将原始数据直接返回。如果对应的值存在，则根据对应的 `schema` 生成数实体。
 
 
-# 参考文章
+## 参考文章
 
 - [使用 normalizr 进行复杂数据转换](https://segmentfault.com/a/1190000042216483)
 - [normalizr Github 文档](https://github.com/paularmstrong/normalizr/blob/master/docs/api.md)
