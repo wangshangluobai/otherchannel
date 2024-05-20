@@ -1,3 +1,18 @@
+
+
+# 高级语法
+
+1. [惰性函数](/FrontEnd/JavaScript/AdvancedSyntax/lazy)
+2. [算法库 GitHub](https://github.com/trekhleb/javascript-algorithms)
+
+
+
+
+
+
+
+
+
 ### 循环优化-并发
 
 ```js
