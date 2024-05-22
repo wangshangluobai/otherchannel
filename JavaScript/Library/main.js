@@ -6,14 +6,14 @@
 
 // 链表
 
-class Node {
+export class Node {
   constructor(value, next = null){
     this.value = value;
     this.next = next;
   }
 }
 
-class LinkedList {
+export class LinkedList {
   constructor(){
     this.head = null;
     this.tail = null;
@@ -39,6 +39,7 @@ class LinkedList {
     this.size++;
 
     if(!this.tail){
+      this.head = node;
       this.tail = node;
     }else{
       this.tail.next = node;
@@ -49,76 +50,100 @@ class LinkedList {
 
   // 中间插入节点
   insert(value, index){
-    // const node = new Node(value);
     if(index < 0 || index > this.size){
-      console.error("参数异常-索引错误，值不能添加至错误的位置");
+      throw new Error("参数异常-索引错误，值不能添加至错误的位置");
     }else if(index === 0){
       this.append(value);
     }else if(index === this.size){
       this.prepend(value);
     }else{
-      let node_of_index = this.find({ index })
-      if(!node_of_index) return;
+      let currentNode = this.head;
+      let currentIndex = this.size;
       let node = new Node(value);
-      node.next = node_of_index.next;
-      node_of_index.next = node;
+      while (currentNode && currentIndex > 1) {
+        if(currentIndex === index) break;
+        currentNode = currentNode.next;
+        currentIndex--;
+      }
+
+      node.next = currentNode.next;
+      currentNode.next = node;
+      
     }
     
     return this;
   }
 
-  // 删除节点
-  delete(params){
+  /**
+   * @param {*} value 
+   * @returns {[Node]}
+   * @description 删除节点
+   *  1. 将链表中所有的value值删除
+   */ 
+  delete(value){
     if(!this.head) return null;
-    const { value, index } = params || {};
+
+    let deleteNodes = [];
+
+    while(this.head && this.head.value === value){
+      deleteNodes.push(this.head);
+      this.head = this.head.next;
+    }
+    
 
     let currentNode = this.head;
     let node_
   }
 
   // 查询节点
-  find(params){
-    if(!this.head) return null;
-    const { value, index, callback } = params || {};
+  // find(params){
+  //   if(!this.head) return null;
+  //   const { value, index, callback } = params || {};
 
     
-    // const checkParams = (index) => index && true;
+  //   // const checkParams = (index) => index && true;
     
-    let currentNode = this.head;
-    let node_index = this.size;
+  //   let currentNode = this.head;
+  //   let node_index = this.size;
 
-    while (currentNode) {
-      node_index--;
+  //   while (currentNode) {
+  //     node_index--;
 
-      if(value !== undefined && currentNode.value === value){
-        return currentNode;
-      }
-      if(index === node_index){
-        return currentNode;
-      }
+  //     if(value !== undefined && currentNode.value === value){
+  //       return currentNode;
+  //     }
+  //     if(index === node_index){
+  //       return currentNode;
+  //     }
 
-      if(callback && callback(currentNode.value)){
-        return currentNode;
-      }
+  //     if(callback && callback(currentNode.value)){
+  //       return currentNode;
+  //     }
 
-      currentNode = currentNode.next;
-    }
+  //     currentNode = currentNode.next;
+  //   }
       
-      // console.error("参数异常-缺少查询依据")
-      // return null;
-  }
+  //     // console.error("参数异常-缺少查询依据")
+  //     // return null;
+  // }
 
 
 }
 
 let data = new LinkedList;
+
+// data.prepend(1);
+// data.prepend(2);
+// data.prepend(3);
+// data.prepend(4);
+// // data.append(0);
+// // data.append(-1);
+// // data.append(-2);
+// data.insert(99, 0);
 data.prepend(1);
-data.prepend(2);
-data.prepend(3);
-data.prepend(4);
-data.append(0);
-data.append(-1);
-data.append(-2);
-data.insert(99, 3);
+data.insert(2,1);
+
 
 console.log("linkedList",data);
+
+
