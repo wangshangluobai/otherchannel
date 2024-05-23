@@ -39,3 +39,112 @@
 8. **特定算法实现**：某些算法在链表上实现更为自然和高效，如LRU缓存淘汰算法。
 
 然而，链表也有其局限性，例如不支持高效的随机访问，这使得在需要频繁访问特定位置元素的场景下，链表可能不是最佳选择。此外，链表的空间开销较大，因为它需要额外的指针存储空间。在选择数据结构时，需要根据具体的应用场景和需求来权衡利弊。
+
+
+
+# JSDoc（JavaScript Documentation）
+
+JSDoc 是一种用于 JavaScript 代码的注释规范，它使用特定的标签（如 @param、@returns 等）来描述函数、类、变量等的结构、参数、返回值和用途。这样，开发者可以使用工具自动生成文档，或者让 IDE 和代码编辑器提供更好的智能提示和类型检查。
+
+1. @param - 描述函数参数：
+
+```js
+   /**
+    * @param {string} name - 传入的名字
+    * @param {number} age - 传入的年龄
+    */
+   function greet(name, age) {
+     console.log(`Hello, ${name}. You are ${age} years old.`);
+   }
+```
+
+2. @returns - 描述函数返回值：
+
+```js
+   /**
+    * @returns {boolean} - 返回操作是否成功
+    */
+   function isPrime(number) {
+     // ...
+   }
+```
+
+3. @class - 描述类：
+
+```js
+   /**
+    * @class Person
+    * @constructor
+    * @param {string} name - 人的名字
+    * @param {number} age - 人的年龄
+    */
+   function Person(name, age) {
+     this.name = name;
+     this.age = age;
+   }
+```
+
+4. @property - 描述对象的属性：
+
+```js
+   /**
+    * @class Person
+    * @property {string} name - 人的名字
+    * @property {number} age - 人的年龄
+    */
+```
+
+5. @example - 提供代码示例：
+
+```js
+   /**
+    * @param {string} text - 要转换的文本
+    * @returns {string} - 转换后的文本
+    * @example
+    * toUpperCase('hello') // returns 'HELLO'
+    */
+   function toUpperCase(text) {
+     return text.toUpperCase();
+   }
+```
+
+6. @typedef - 定义自定义数据类型：
+
+```js
+   /**
+    * @typedef {object} Address
+    * @property {string} street - 街道地址
+    * @property {string} city - 城市名
+    * @property {string} zip - 邮政编码
+    */
+```
+
+7. @throws - 描述函数可能抛出的错误：
+
+```js
+   /**
+    * @param {number} a
+    * @param {number} b
+    * @returns {number}
+    * @throws {TypeError} - 如果传入的不是数字
+    */
+   function add(a, b) {
+     if (typeof a !== 'number' || typeof b !== 'number') {
+       throw new TypeError('Both arguments must be numbers');
+     }
+     return a + b;
+   }
+```
+
+8. @deprecated - 标记不再推荐使用的功能：
+
+```js
+   /**
+    * @deprecated since version 2.0 - Use `newMethod` instead.
+    */
+   function oldMethod() {
+     // ...
+   }
+```
+
+JSDoc 的完整规范可以在其官方文档中找到：https://www.jsdoc.com.cn/。这个文档提供了所有可用标签的详细说明和使用示例。
