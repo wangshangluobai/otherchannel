@@ -6,6 +6,12 @@
 
 // 链表
 
+/**
+ * 链表节点
+ * @class Node
+ * @param {*} value
+ * @param {next} [next=null]
+ */
 export class Node {
   constructor(value, next = null){
     this.value = value;
@@ -13,6 +19,11 @@ export class Node {
   }
 }
 
+/**
+ * 创建一个新的链表实例
+ * @class LinkedList
+ * @returns {LinkedList}
+ */
 export class LinkedList {
   constructor(){
     this.head = null;
@@ -20,7 +31,12 @@ export class LinkedList {
     this.size = 0;
   }
 
-  // 头部添加节点
+  /**
+   * @param {*} value
+   * @returns {LinkedList}
+   * @description 头部添加节点
+   *  1. 将新节点作为 head
+   */
   prepend(value){
     const node = new Node(value, this.head);
     this.head = node;
@@ -32,7 +48,12 @@ export class LinkedList {
     return this;
   }
 
-  // 尾部追加节点
+  /**
+   * @param {*} value
+   * @returns {LinkedList}
+   * @description 尾部追加节点
+   *  1. 将新节点作为 tail 节点
+   */
   append(value){
     const node = new Node(value);
 
@@ -48,7 +69,16 @@ export class LinkedList {
     return this;
   }
 
-  // 中间插入节点
+  /**
+   * @param {*} value
+   * @param {*} index
+   * @returns {LinkedList}
+   * @description 中间插入节点
+   *  1. 边界判断， index 不能小于 0 或者大于链表的长度
+   *  2. 当 index 等于 0 时，直接调用 append 方法
+   *  3. 当 index 等于 size 时，调用 prepend 方法
+   *  4. 找到 index 位置的的节点，将新节点添加至该节点后
+   */
   insert(value, index){
     if(index < 0 || index > this.size){
       throw new Error("参数异常-索引错误，值不能添加至错误的位置");
@@ -88,62 +118,120 @@ export class LinkedList {
     while(this.head && this.head.value === value){
       deleteNodes.push(this.head);
       this.head = this.head.next;
+      this.size--;
     }
     
 
     let currentNode = this.head;
-    let node_
+    while (currentNode?.next) {
+      if(currentNode.next.value ===  value){
+        deleteNodes.push(currentNode.next);
+        currentNode.next = currentNode.next.next;
+        this.size--;
+      }else{
+        currentNode = currentNode.next;
+      }
+    }
+
+    if(this.tail && this.tail.value === value) this.tail = currentNode;
+
+    return deleteNodes;
   }
 
-  // 查询节点
-  // find(params){
-  //   if(!this.head) return null;
-  //   const { value, index, callback } = params || {};
-
+  /**
+   * @param {*} value
+   * @returns {Node}
+   * @description 查询节点
+   *  1. 只查询第一个符合条件的节点
+   */
+  find(value){
+    if(!this.head) return null;
     
-  //   // const checkParams = (index) => index && true;
-    
-  //   let currentNode = this.head;
-  //   let node_index = this.size;
+    let currentNode = this.head;
 
-  //   while (currentNode) {
-  //     node_index--;
+    while (currentNode) {
 
-  //     if(value !== undefined && currentNode.value === value){
-  //       return currentNode;
-  //     }
-  //     if(index === node_index){
-  //       return currentNode;
-  //     }
+      if(value !== undefined && currentNode.value === value){
+        return currentNode;
+      }
 
-  //     if(callback && callback(currentNode.value)){
-  //       return currentNode;
-  //     }
-
-  //     currentNode = currentNode.next;
-  //   }
+      currentNode = currentNode.next;
+    }
       
-  //     // console.error("参数异常-缺少查询依据")
-  //     // return null;
-  // }
+    return null;
+  }
 
+  /**
+   * @returns {Node}
+   * @description 删除尾节点
+   */
+  deleteTail(){
+    if(!this.head) return null;
+
+    let deleteTail = this.tail;
+
+    if(this.head === this.tail){
+      this.head = null;
+      this.tail = null;
+      this.size--;
+    }
+
+    let currentNode = this.head;
+    while(currentNode.next){
+      if(currentNode.next.next === null){
+        deleteTail = currentNode.next;
+        currentNode.next = null;
+        this.tail = currentNode;
+        this.size--;
+      }else{
+        currentNode = currentNode.next;
+      }
+    }
+    return deleteTail;
+  }
+
+  /**
+   * @returns {Node}
+   * @description 删除链表头部节点
+   */
+  deleteHead(){
+    if(!this.head) return null;
+
+    let deleteHead = this.head;
+    if(this.head.next){
+      this.head = this.head.next;
+    }else{
+      this.head = null;
+      this.tail = null;
+    }
+    this.size--;
+
+    return deleteHead;
+  }
+
+  /**
+   * @param {Array} value
+   * @description 从数组中创建链表
+   */
+  fromArray(value){},
 
 }
 
 let data = new LinkedList;
 
-// data.prepend(1);
-// data.prepend(2);
-// data.prepend(3);
-// data.prepend(4);
-// // data.append(0);
-// // data.append(-1);
-// // data.append(-2);
-// data.insert(99, 0);
 data.prepend(1);
-data.insert(2,1);
+data.prepend(2);
+data.prepend(3);
+data.prepend(4);
+// data.append(0);
+// data.append(-1);
+// data.append(-2);
+// data.insert(99, 0);
+
+// data.prepend(1);
+// data.insert(2,1);
 
 
-console.log("linkedList",data);
+console.log("linkedList",data, data.deleteTail());
 
 
