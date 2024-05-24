@@ -23,6 +23,7 @@ export class Node {
  * 创建一个新的链表实例
  * @class LinkedList
  * @returns {LinkedList}
+ * @TODO 通过参数配置设置 链表类型-头尾链接或其他扩展
  */
 export class LinkedList {
   constructor(){
@@ -109,6 +110,7 @@ export class LinkedList {
    * @returns {[Node]}
    * @description 删除节点
    *  1. 将链表中所有的value值删除
+   * @TODO 如果链表中存在多个重复的值，通过设置来决定移除哪一项
    */ 
   delete(value){
     if(!this.head) return null;
@@ -143,6 +145,7 @@ export class LinkedList {
    * @returns {Node}
    * @description 查询节点
    *  1. 只查询第一个符合条件的节点
+   * @TODO 参数可以接受函数， 通过此函数判断链表节点值是否为查询值
    */
   find(value){
     if(!this.head) return null;
@@ -212,17 +215,106 @@ export class LinkedList {
   /**
    * @param {Array} value
    * @description 从数组中创建链表
+   * @return {LinkedList}
+   * @TODO 该方法需要可以从 LinkedList 类上直接调用
    */
-  fromArray(value){},
+  fromArray(value){
+    if(!Array.isArray(value)) throw new Error("参数类型异常-应为 Array ");
+
+    value.length && value.forEach((i) => this.append(i));
+
+    return this;
+  }
+
+  /**
+   * @param {Object} [params] -参数对象
+   * @param {Function} [callback] -为每一个链表节点值都将作为参数传入此回调
+   * @return {LinkedListNode[]}
+   * @description 将链表转为数组
+   */
+  toArray(params){
+    let List = [];
+    if(!this.head) return List;
+
+    const { callback } = params || {};
+
+    let currentNode = this.head;
+    while(currentNode){
+      if(callback && Object.prototype.toString.call(callback) === "[object Function]"){
+        List.push(callback(currentNode.value));
+      }else{
+        List.push(currentNode.value)
+      }
+
+      currentNode = currentNode.next;
+    }
+
+    return List;
+  }
+
+  /**
+   * @return {LinkedList}
+   * @description 将链表节点顺序反转
+   */
+  reverse(){
+    if(!this.head) return this;
+
+    let currentNode = this.head;
+    let nextNode = null;
+    let prevNode = null;
+
+    while(currentNode) {
+      // 取原链表顺序下的下节点记录
+      nextNode = currentNode.next;
+      // 处理当前节点的下节点为 null || 已经逆转过的链表
+      currentNode.next = prevNode;
+
+      // 将处理过的链表记录，待下轮使用
+      prevNode = currentNode;
+      // 更新下轮处理节点
+      currentNode = nextNode;
+    }
+
+    // 逆转链表尾部即是原链表头部
+    this.tail = this.head;
+    // 新链表的头部即是最后处理的节点，但当前节点是 null ，所以取处理过的链表记录
+    this.head = prevNode;
+
+    return this;
+  }
 
 }
 
 let data = new LinkedList;
 
+/* 
+// fromArray 测试
 data.prepend(1);
 data.prepend(2);
 data.prepend(3);
 data.prepend(4);
+data.fromArray(['a', 'b'])
+data.fromArray([])
+*/
+
+/*
+// toArray 测试
+data.prepend(1);
+data.prepend(2);
+data.prepend(3);
+data.prepend(4);
+console.log('%c [ data.toArray(); ]-274', 'font-size:13px; background:#97d08a; color:#dbffce;', data.toArray());
+*/
+
+/*
+// reverse 测试
+data.prepend(1);
+data.prepend(2);
+data.prepend(3);
+data.prepend(4);
+console.log('%c [ data.reverse() ]-305', 'font-size:13px; background:#8dc344; color:#d1ff88;', data.reverse());
+*/
+
 // data.append(0);
 // data.append(-1);
 // data.append(-2);
@@ -232,6 +324,6 @@ data.prepend(4);
 // data.insert(2,1);
 
 
-console.log("linkedList",data, data.deleteTail());
+// console.log("linkedList",data, data.deleteTail());
 
 
