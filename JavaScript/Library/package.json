@@ -5,7 +5,8 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "test": "mocha --require @babel/register --recursive test/*.test.js"
+    "test": "mocha --require @babel/register --recursive test/*.test.js",
+    "test-jest": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -13,10 +14,12 @@
     "normalizr": "^3.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/preset-env": "^7.24.5",
+    "@babel/core": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
     "@babel/register": "^7.23.7",
+    "babel-jest": "^29.7.0",
     "chai": "^5.1.1",
+    "jest": "^29.7.0",
     "mocha": "^10.4.0"
   }
 }

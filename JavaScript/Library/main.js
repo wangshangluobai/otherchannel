@@ -1,18 +1,13 @@
-// const ARRAY_DATA = [
-//   { id: 1, name: 'John', age: 20, friends: [2, 3] },
-//   { id: 2, name: 'Jane', age: 21, friends: [1, 3] },
-//   { id: 3, name: 'Jim', age: 22, friends: [1, 2] }
-// ]
 
 // 链表
 
 /**
  * 链表节点
- * @class Node
+ * @class LinkedNode
  * @param {*} value
  * @param {next} [next=null]
  */
-export class Node {
+export class LinkedNode {
   constructor(value, next = null){
     this.value = value;
     this.next = next;
@@ -20,13 +15,47 @@ export class Node {
 }
 
 /**
+ * 双向链表节点
+ * @class DoubleLinkedNode
+ * @param {*} value
+ * @param {next} [next=null]
+ * @param {previous} [previous=null]
+ */
+export class DoubleLinkedNode extends LinkedNode {
+  constructor(value, next = null, previous = null){
+    super(value, next);
+    this.previous = previous;
+  }
+}
+
+/**
  * 创建一个新的链表实例
  * @class LinkedList
+ * @param {object} [config={}]
+ * @param {string} [config.type='LinkedNode']
  * @returns {LinkedList}
  * @TODO 通过参数配置设置 链表类型-头尾链接或其他扩展
  */
 export class LinkedList {
-  constructor(){
+  #NODE;
+  constructor(config){
+    const { type = 'LinkedList' } = config || {};
+
+    switch (type) {
+      case 'LinkedList':
+        this.#NODE = LinkedNode;
+        break;
+
+      case 'DoubleLinkedList':
+        this.#NODE = DoubleLinkedNode;
+        this.previous = null;
+        break;
+
+      default:
+        this.#NODE = LinkedNode;
+        break;
+    }
+
     this.head = null;
     this.tail = null;
     this.size = 0;
@@ -39,7 +68,7 @@ export class LinkedList {
    *  1. 将新节点作为 head
    */
   prepend(value){
-    const node = new Node(value, this.head);
+    const node = new this.#NODE(value, this.head);
     this.head = node;
     this.size++;
 
@@ -56,7 +85,7 @@ export class LinkedList {
    *  1. 将新节点作为 tail 节点
    */
   append(value){
-    const node = new Node(value);
+    const node = new this.#NODE(value);
 
     this.size++;
 
@@ -90,7 +119,7 @@ export class LinkedList {
     }else{
       let currentNode = this.head;
       let currentIndex = this.size;
-      let node = new Node(value);
+      let node = new this.#NODE(value);
       while (currentNode && currentIndex > 1) {
         if(currentIndex === index) break;
         currentNode = currentNode.next;
@@ -107,7 +136,7 @@ export class LinkedList {
 
   /**
    * @param {*} value 
-   * @returns {[Node]}
+   * @returns {[#NODE]}
    * @description 删除节点
    *  1. 将链表中所有的value值删除
    * @TODO 如果链表中存在多个重复的值，通过设置来决定移除哪一项
@@ -142,7 +171,7 @@ export class LinkedList {
 
   /**
    * @param {*} value
-   * @returns {Node}
+   * @returns {#NODE}
    * @description 查询节点
    *  1. 只查询第一个符合条件的节点
    * @TODO 参数可以接受函数， 通过此函数判断链表节点值是否为查询值
@@ -165,7 +194,7 @@ export class LinkedList {
   }
 
   /**
-   * @returns {Node}
+   * @returns {#NODE}
    * @description 删除尾节点
    */
   deleteTail(){
@@ -180,7 +209,7 @@ export class LinkedList {
     }
 
     let currentNode = this.head;
-    while(currentNode.next){
+    while(currentNode?.next){
       if(currentNode.next.next === null){
         deleteTail = currentNode.next;
         currentNode.next = null;
@@ -194,7 +223,7 @@ export class LinkedList {
   }
 
   /**
-   * @returns {Node}
+   * @returns {#NODE}
    * @description 删除链表头部节点
    */
   deleteHead(){
@@ -285,7 +314,8 @@ export class LinkedList {
 
 }
 
-let data = new LinkedList;
+// #region 单向链表测试
+// let data = new LinkedList;
 
 /* 
 // fromArray 测试
@@ -314,16 +344,15 @@ data.prepend(3);
 data.prepend(4);
 console.log('%c [ data.reverse() ]-305', 'font-size:13px; background:#8dc344; color:#d1ff88;', data.reverse());
 */
+//#endregion
 
-// data.append(0);
-// data.append(-1);
-// data.append(-2);
-// data.insert(99, 0);
+//#region 双向链表测试
+let data = new LinkedList({type: "DoubleLinkedList"});
+/*
+data.prepend(1);
+ */
+console.log("DoubleLinkedNode",data);
+//#endregion
 
-// data.prepend(1);
-// data.insert(2,1);
-
-
-// console.log("linkedList",data, data.deleteTail());
 
 
