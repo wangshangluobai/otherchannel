@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { LinkedList, Node } from '../main.js';
+import { LinkedList, DoublyLinkedList, DoubleLinkedNode, LinkedNode } from '../main.js';
 
 /**
  * 单向列表测试
@@ -181,5 +181,255 @@ describe('LinkedList', () => {
     expect(linkedList.head).toBeNull();
     expect(linkedList.tail).toBeNull();
     expect(linkedList.size).toBe(0);
+  });
+});
+
+/**
+ * 测试双链表
+ */
+describe('DoublyLinkedList', () => {
+  let list;
+
+  beforeEach(() => {
+    list = new DoublyLinkedList();
+  });
+
+  describe('#prepend', () => {
+    test('should prepend a node to an empty list', () => {
+      const value = 1;
+      list.prepend(value);
+
+      expect(list.size).toBe(1);
+      expect(list.head instanceof DoubleLinkedNode).toBe(true);
+      expect(list.head.value).toBe(value);
+      expect(list.tail.value).toBe(value);
+    });
+
+    test('should prepend a node to a non-empty list', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.prepend(value1);
+      list.prepend(value2);
+
+      expect(list.size).toBe(2);
+      expect(list.head.value).toBe(value2);
+      expect(list.tail.value).toBe(value1);
+    });
+  });
+
+  describe('#append', () => {
+    test('should append a node to an empty list', () => {
+      const value = 1;
+      list.append(value);
+
+      expect(list.size).toBe(1);
+      expect(list.head.value).toBe(value);
+      expect(list.tail.value).toBe(value);
+    });
+
+    test('should append a node to a non-empty list', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.append(value1);
+      list.append(value2);
+
+      expect(list.size).toBe(2);
+      expect(list.head.value).toBe(value1);
+      expect(list.tail.value).toBe(value2);
+    });
+  });
+
+  describe('#insert', () => {
+    test('should insert a node at the beginning of an empty list', () => {
+      const value = 1;
+      list.insert(value, 0);
+
+      expect(list.size).toBe(1);
+      expect(list.head.value).toBe(value);
+      expect(list.tail.value).toBe(value);
+    });
+
+    test('should insert a node at the end of an empty list', () => {
+      const value = 1;
+      list.insert(value, 0);
+
+      expect(list.size).toBe(1);
+      expect(list.head.value).toBe(value);
+      expect(list.tail.value).toBe(value);
+    });
+
+    test('should insert a node in the middle of a list', () => {
+      const value1 = 1;
+      const value2 = 2;
+      const value3 = 3;
+      list.append(value1);
+      list.append(value3);
+      list.insert(value2, 1);
+
+      expect(list.size).toBe(3);
+      expect(list.head.value).toBe(value1);
+      expect(list.find(2)?.value).toBe(value2);
+      expect(list.tail.value).toBe(value3);
+    });
+
+    test('should throw an error for invalid index', () => {
+      const value = 1;
+      expect(() => list.insert(value, -1)).toThrow("参数异常-索引错误，值不能添加至错误的位置");
+      expect(() => list.insert(value, 5)).toThrow("参数异常-索引错误，值不能添加至错误的位置");
+    });
+  });
+
+  describe('#delete', () => {
+    test('should delete all nodes with the given value', () => {
+      const value1 = 1;
+      const value2 = 1;
+      const value3 = 3;
+      list.append(value1);
+      list.append(value2);
+      list.append(value3);
+      const deletedNodes = list.delete(value1);
+
+      expect(deletedNodes.length).toBe(2);
+      expect(list.size).toBe(1);
+      expect(list.head.value).toBe(value3);
+      expect(list.tail.value).toBe(value3);
+    });
+
+    test('should not delete any nodes when no nodes have the given value', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.append(value1);
+      list.append(value2);
+      const deletedNodes = list.delete(3);
+
+      expect(deletedNodes.length).toBe(0);
+      expect(list.size).toBe(2);
+    });
+  });
+
+  describe('#deleteTail', () => {
+    test('should delete the tail node of an empty list', () => {
+      const deletedTail = list.deleteTail();
+
+      expect(deletedTail).toBe(null);
+      expect(list.size).toBe(0);
+    });
+
+    test('should delete the tail node of a single-node list', () => {
+      const value = 1;
+      list.append(value);
+      const deletedTail = list.deleteTail();
+
+      expect(deletedTail.value).toBe(value);
+      expect(list.size).toBe(0);
+    });
+
+    test('should delete the tail node of a multi-node list', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.append(value1);
+      list.append(value2);
+      const deletedTail = list.deleteTail();
+
+      expect(deletedTail.value).toBe(value2);
+      expect(list.size).toBe(1);
+      expect(list.tail.value).toBe(value1);
+    });
+  });
+
+  describe('#deleteHead', () => {
+    test('should delete the head node of an empty list', () => {
+      const deletedHead = list.deleteHead();
+
+      expect(deletedHead).toBe(null);
+      expect(list.size).toBe(0);
+    });
+
+    test('should delete the head node of a single-node list', () => {
+      const value = 1;
+      list.append(value);
+      const deletedHead = list.deleteHead();
+
+      expect(deletedHead.value).toBe(value);
+      expect(list.size).toBe(0);
+    });
+
+    test('should delete the head node of a multi-node list', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.append(value1);
+      list.append(value2);
+      const deletedHead = list.deleteHead();
+
+      expect(deletedHead.value).toBe(value1);
+      expect(list.size).toBe(1);
+      expect(list.head.value).toBe(value2);
+    });
+  });
+
+  describe('#toArray', () => {
+    test('should convert an empty list to an array', () => {
+      const array = list.toArray();
+
+      expect(array.length).toBe(0);
+    });
+
+    test('should convert a populated list to an array', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.append(value1);
+      list.append(value2);
+
+      const array = list.toArray();
+
+      expect(array.length).toBe(2);
+      expect(array[0]).toBe(value1);
+      expect(array[1]).toBe(value2);
+    });
+
+    test('should apply a callback function to each element', () => {
+      const value1 = 1;
+      const value2 = 2;
+      list.append(value1);
+      list.append(value2);
+
+      const array = list.toArray({ callback: (value) => value * 2 });
+
+      expect(array.length).toBe(2);
+      expect(array[0]).toBe(2);
+      expect(array[1]).toBe(4);
+    });
+  });
+
+  describe('#reverse', () => {
+    test('should reverse an empty list', () => {
+      list.reverse();
+
+      expect(list.size).toBe(0);
+    });
+
+    test('should reverse a single-node list', () => {
+      const value = 1;
+      list.append(value);
+      list.reverse();
+
+      expect(list.size).toBe(1);
+      expect(list.head.value).toBe(value);
+      expect(list.tail.value).toBe(value);
+    });
+
+    test('should reverse a multi-node list', () => {
+      const value1 = 1;
+      const value2 = 2;
+      const value3 = 3;
+      list.append(value1);
+      list.append(value2);
+      list.append(value3);
+      list.reverse();
+
+      expect(list.size).toBe(3);
+      expect(list.head.value).toBe(value3);
+      expect(list.tail.value).toBe(value1);
+    });
   });
 });

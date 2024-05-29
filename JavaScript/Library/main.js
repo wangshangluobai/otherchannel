@@ -22,9 +22,9 @@ export class LinkedNode {
  * @param {previous} [previous=null]
  */
 export class DoubleLinkedNode extends LinkedNode {
-  constructor(value, next = null, previous = null){
+  constructor(value, next = null, prev = null){
     super(value, next);
-    this.previous = previous;
+    this.prev = prev;
   }
 }
 
@@ -37,24 +37,23 @@ export class DoubleLinkedNode extends LinkedNode {
  * @TODO 通过参数配置设置 链表类型-头尾链接或其他扩展
  */
 export class LinkedList {
-  #NODE;
   constructor(config){
     const { type = 'LinkedList' } = config || {};
 
-    switch (type) {
-      case 'LinkedList':
-        this.#NODE = LinkedNode;
-        break;
+    // switch (type) {
+    //   case 'LinkedList':
+    //     this.#NODE = LinkedNode;
+    //     break;
 
-      case 'DoubleLinkedList':
-        this.#NODE = DoubleLinkedNode;
-        this.previous = null;
-        break;
+    //   case 'DoubleLinkedList':
+    //     this.#NODE = DoubleLinkedNode;
+    //     this.previous = null;
+    //     break;
 
-      default:
-        this.#NODE = LinkedNode;
-        break;
-    }
+    //   default:
+    //     this.#NODE = LinkedNode;
+    //     break;
+    // }
 
     this.head = null;
     this.tail = null;
@@ -68,7 +67,7 @@ export class LinkedList {
    *  1. 将新节点作为 head
    */
   prepend(value){
-    const node = new this.#NODE(value, this.head);
+    const node = new LinkedNode(value, this.head);
     this.head = node;
     this.size++;
 
@@ -85,7 +84,7 @@ export class LinkedList {
    *  1. 将新节点作为 tail 节点
    */
   append(value){
-    const node = new this.#NODE(value);
+    const node = new LinkedNode(value);
 
     this.size++;
 
@@ -119,7 +118,7 @@ export class LinkedList {
     }else{
       let currentNode = this.head;
       let currentIndex = this.size;
-      let node = new this.#NODE(value);
+      let node = new LinkedNode(value);
       while (currentNode && currentIndex > 1) {
         if(currentIndex === index) break;
         currentNode = currentNode.next;
@@ -129,6 +128,7 @@ export class LinkedList {
       node.next = currentNode.next;
       currentNode.next = node;
       
+      this.size++;
     }
     
     return this;
@@ -356,3 +356,230 @@ console.log("DoubleLinkedNode",data);
 
 
 
+
+// 策略模式
+
+/**
+ * @description 双向链表
+ * @returns {LinkedList}
+ */
+export class DoublyLinkedList extends LinkedList {
+  constructor() {
+    super();
+    this.head = null;
+    this.tail = null;
+    this.size = 0;
+  }
+
+  /**
+   * @param {*} value
+   * @returns {DoublyLinkedList}
+   * @description 头部添加节点
+   *  1. 将新节点作为 head 
+   */
+  prepend(value){
+    const node = new DoubleLinkedNode(value, this.head, this.head?.prev);
+    this.head = node;
+    this.size++;
+
+    if(!this.tail){
+      this.tail = node;
+    }
+    return this;
+  }
+
+  /**
+   * @param {*} value
+   * @returns {DoublyLinkedList}
+   * @description 尾部追加节点
+   *  1. 将新节点作为 tail 节点
+   */
+  append(value){
+    const node = new DoubleLinkedNode(value);
+
+    this.size++;
+
+    if(!this.tail){
+      this.head = node;
+      this.tail = node;
+    }else{
+      this.tail.next = node;
+      node.prev = this.tail;
+      this.tail = node;
+    }
+    return this;
+  }
+
+  /**
+   * @param {*} value
+   * @param {*} index
+   * @returns {DoublyLinkedList}
+   * @description 中间插入节点
+   *  1. 边界判断， index 不能小于 0 或者大于链表的长度
+   *  2. 当 index 等于 0 时，直接调用 append 方法
+   *  3. 当 index 等于 size 时，调用 prepend 方法
+   *  4. 找到 index 位置的的节点，将新节点添加至该节点后
+   */
+  insert(value, index){
+    if(index < 0 || index > this.size){
+      throw new Error("参数异常-索引错误，值不能添加至错误的位置");
+    }else if(index === 0){
+      this.append(value);
+    }else if(index === this.size){
+      this.prepend(value);
+    }else{
+      let currentNode = this.head;
+      let currentIndex = this.size;
+      let node = new DoubleLinkedNode(value);
+      while (currentNode && currentIndex > 1) {
+        if(currentIndex === index) break;
+        currentNode = currentNode.next;
+        currentIndex--;
+      }
+
+      node.next = currentNode.next;
+      node.prev = currentNode;
+      currentNode.next = node;
+      
+      this.size++;
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {*} value 
+   * @returns {[DoubleLinkedNode]}
+   * @description 删除节点
+   *  1. 将链表中所有的value值删除
+   * @TODO 如果链表中存在多个重复的值，通过设置来决定移除哪一项
+   */ 
+  delete(value){
+    if(!this.head) return null;
+
+    let deleteNodes = [];
+
+    while(this.head && this.head.value === value){
+      deleteNodes.push(this.head);
+      this.head = this.head.next;
+      this.head.prev = null;
+      this.size--;
+    }
+    
+
+    let currentNode = this.head;
+    while (currentNode?.next) {
+      if(currentNode.next.value ===  value){
+        deleteNodes.push(currentNode.next);
+        currentNode.next = currentNode.next.next;
+        currentNode.next.prev = currentNode;
+        this.size--;
+      }else{
+        currentNode = currentNode.next;
+      }
+    }
+
+    if(this.tail && this.tail.value === value) this.tail = currentNode;
+
+    return deleteNodes;
+  }
+
+  /**
+   * @returns {DoubleLinkedNode}
+   * @description 删除尾节点
+   */
+  deleteTail(){
+    if(!this.head) return null;
+
+    let deleteTail = this.tail;
+    if(this.head === this.tail){
+      this.head = null;
+      this.tail = null;
+    }else{
+      this.tail = this.tail.prev;
+      this.tail.next = null;
+    }
+
+    this.size--;
+
+    return deleteTail;
+  }
+
+  /**
+   * @returns {DoubleLinkedNode}
+   * @description 删除链表头部节点
+   */
+  deleteHead(){
+    if(!this.head) return null;
+
+    let deleteHead = this.head;
+    if(this.head.next){
+      this.head = this.head.next;
+      this.head.prev = null;
+    }else{
+      this.head = null;
+      this.tail = null;
+    }
+    this.size--;
+
+    return deleteHead;
+  }
+
+  /**
+   * @param {Object} [params] -参数对象
+   * @param {Function} [callback] -为每一个链表节点值都将作为参数传入此回调
+   * @return {DoubleLinkedNode[]}
+   * @description 将链表转为数组
+   */
+  toArray(params){
+    let List = [];
+    if(!this.head) return List;
+
+    const { callback } = params || {};
+
+    let currentNode = this.head;
+    while(currentNode){
+      if(callback && Object.prototype.toString.call(callback) === "[object Function]"){
+        List.push(callback(currentNode.value));
+      }else{
+        List.push(currentNode.value)
+      }
+
+      currentNode = currentNode.next;
+    }
+
+    return List;
+  }
+
+  /**
+   * @return {LinkedList}
+   * @description 将链表节点顺序反转
+   */
+  reverse(){
+    if(!this.head) return this;
+
+    let currentNode = this.head;
+    let nextNode = null;
+    let prevNode = null;
+
+    while(currentNode) {
+      // 取原链表顺序下的下节点记录
+      nextNode = currentNode.next;
+      // 处理当前节点的下节点为 null || 已经逆转过的链表
+      currentNode.next = prevNode;
+      currentNode.prev = nextNode;
+
+      // 将处理过的链表记录，待下轮使用
+      prevNode = currentNode;
+      // 更新下轮处理节点
+      currentNode = nextNode;
+    }
+
+    // 逆转链表尾部即是原链表头部
+    this.tail = this.head;
+    // 新链表的头部即是最后处理的节点，但当前节点是 null ，所以取处理过的链表记录
+    this.head = prevNode;
+
+    return this;
+  }
+}
