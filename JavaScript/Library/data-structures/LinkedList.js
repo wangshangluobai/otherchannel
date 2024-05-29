@@ -298,6 +298,14 @@ export class LinkedList {
     return this;
   }
 
+  /**
+   * @return {Boolean}
+   * @description 判断链表是否为空
+   */
+  isEmpty(){
+    return !this.head;
+  }
+
 }
 
 // #region 单向链表测试
@@ -337,7 +345,7 @@ let data = new LinkedList({type: "DoubleLinkedList"});
 /*
 data.prepend(1);
  */
-console.log("DoubleLinkedNode",data);
+// console.log("DoubleLinkedNode",data);
 //#endregion
 
 
