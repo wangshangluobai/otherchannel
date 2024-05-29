@@ -38,22 +38,8 @@ export class DoubleLinkedNode extends LinkedNode {
  */
 export class LinkedList {
   constructor(config){
+    // 本想通过 策略模式 实现通过一个类创建不同的链表类型，但似乎没什么强烈的意义
     const { type = 'LinkedList' } = config || {};
-
-    // switch (type) {
-    //   case 'LinkedList':
-    //     this.#NODE = LinkedNode;
-    //     break;
-
-    //   case 'DoubleLinkedList':
-    //     this.#NODE = DoubleLinkedNode;
-    //     this.previous = null;
-    //     break;
-
-    //   default:
-    //     this.#NODE = LinkedNode;
-    //     break;
-    // }
 
     this.head = null;
     this.tail = null;

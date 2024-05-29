@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { LinkedList, DoublyLinkedList, DoubleLinkedNode, LinkedNode } from '../main.js';
+import { LinkedList, DoublyLinkedList, DoubleLinkedNode, LinkedNode } from '../data-structures/LinkedList.js';
 
 /**
  * 单向列表测试
