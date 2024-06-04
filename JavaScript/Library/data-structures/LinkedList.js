@@ -46,6 +46,19 @@ export class LinkedList {
     this.size = 0;
   }
 
+  
+  /**
+   * @param {*} target 被判断的值
+   * @param {*} value 判断参考值
+   * @param {function} [callback] 自定义校验方法
+   * @returns {boolean}
+   * @description 值判断函数
+   */
+  #compare(callback, target, value) {
+    if(!target) return false;
+    return typeof(callback) === 'function' ? callback(target) : target === value;
+  } 
+
   /**
    * @param {*} value
    * @returns {LinkedList}
@@ -121,18 +134,22 @@ export class LinkedList {
   }
 
   /**
-   * @param {*} value 
+   * @param {*} params
+   * @param {callback} [callback] 自定义值匹配方法
+   * @param {value} [value] 查询值
    * @returns {[#NODE]}
    * @description 删除节点
    *  1. 将链表中所有的value值删除
    * @TODO 如果链表中存在多个重复的值，通过设置来决定移除哪一项
    */ 
-  delete(value){
-    if(!this.head) return null;
+  delete(params){
+    if(!this.head || !params) return null;
+
+    typeof(params) !== 'object' && (params = { value: params });
+    const { value, callback } = params || {};
 
     let deleteNodes = [];
-
-    while(this.head && this.head.value === value){
+    while(this.#compare(callback, this.head?.value, value)){
       deleteNodes.push(this.head);
       this.head = this.head.next;
       this.size--;
@@ -141,7 +158,7 @@ export class LinkedList {
 
     let currentNode = this.head;
     while (currentNode?.next) {
-      if(currentNode.next.value ===  value){
+      if(this.#compare(callback, currentNode.next.value, value)){
         deleteNodes.push(currentNode.next);
         currentNode.next = currentNode.next.next;
         this.size--;
@@ -150,26 +167,35 @@ export class LinkedList {
       }
     }
 
-    if(this.tail && this.tail.value === value) this.tail = currentNode;
+    if(this.tail && this.#compare(callback, this.tail.value, value)) this.tail = currentNode;
 
     return deleteNodes;
   }
 
   /**
-   * @param {*} value
+   * @param param {any}
+   * @param {value} [value] 查询值
+   * @param {callback} [callback] 自定义判断函数
    * @returns {#NODE}
    * @description 查询节点
    *  1. 只查询第一个符合条件的节点
-   * @TODO 参数可以接受函数， 通过此函数判断链表节点值是否为查询值
+   * @TODO 查询出所有符合条件的节点
    */
-  find(value){
-    if(!this.head) return null;
+  find(params){
+    if(!this.head || params === undefined) return null;
+
+    typeof(params) !== 'object' && (params = { value: params });
+    const { value, callback } = params || {};
     
     let currentNode = this.head;
 
     while (currentNode) {
 
       if(value !== undefined && currentNode.value === value){
+        return currentNode;
+      }
+
+      if(typeof(callback) === 'function' && callback(currentNode.value)){
         return currentNode;
       }
 
