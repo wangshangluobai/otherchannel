@@ -76,6 +76,52 @@ function sidebarFrontEnd(): DefaultTheme.SidebarItem[] {
   // console.log(111, res)
   return [
     {
+      text: "CSS",
+      collapsed: false,
+      link: "/CascadingStyleSheets/",
+      items: [
+        {
+          text: "Css",
+          link: "/CascadingStyleSheets/css/"
+        },
+        {
+          text: "Less",
+          link: "/CascadingStyleSheets/less/"
+        },
+        {
+          text: "Sass",
+          link: "/CascadingStyleSheets/sass/"
+        }
+      ]
+    },
+    {
+      text: "组件库",
+      collapsed: false,
+      link: "/ComponentLibrary/",
+      items: [
+        {
+          text: "ElementUI",
+          link: "/ComponentLibrary/ElementUI/"
+        }
+      ]
+    },
+    {
+      text: "HTTP",
+      collapsed: false,
+      link: "/HTTP/",
+      items: [
+        {
+          text: "WebSocket",
+          link: "/Http/WebSocket"
+        }
+      ]
+    },
+    {
+      text: "HTML",
+      collapsed: false,
+      link: "/HypertextMark-upLanguage/"
+    },
+    {
       text: "JavaScript",
       collapsed: false,
       link: "/JavaScript/",
