@@ -1,12 +1,16 @@
 
 use List::*;
 
+// 允许debug
+#[derive(Debug)]
 enum List {
   // Cons：元组结构体，包含链表的一个元素和一个只想下一节点的指针
   Cons(u32, Box<List>),
   Nil,
 }
 
+// 允许未使用的代码
+#[allow(dead_code)]
 // 可以为 enum 定义方法
 impl List {
   // 创建一个空的 List 实例
@@ -19,6 +23,34 @@ impl List {
   fn prepend(self, elem: u32) -> List {
     // `Cons` 同样为 List 类型
     Cons(elem, Box::new(self))
+  }
+
+  // 处理一个 List， 在其尾部插入新元素，并返回该 list
+  // 会创建一个全新的链表，不合理
+  // fn append(self, elem: u32) -> List {
+  //   match self {
+  //     List::Cons(value, tail) => List::Cons(value, Box::new(tail.append(elem))),
+  //     List::Nil => List::Cons(elem, Box::new(List::new())),
+  //   }
+  // }
+
+  // 使用可变引用来在链表尾部插入新元素
+  fn append(&mut self, elem: u32) {
+    match self {
+      List::Cons(_, tail) => {
+        // 递归地找到链表的末尾
+        let mut current = tail;
+        while let List::Cons(_, next) = &mut **current {
+          current = next;
+        }
+        // 到达链表末尾，用新元素替换 Nil
+        *current = Box::new(List::Cons(elem, Box::new(List::Nil)));
+      }
+      List::Nil => {
+        // 如果链表为空，用新元素创建一个新的 Cons 节点
+        *self = List::Cons(elem, Box::new(List::Nil));
+      }
+    }
   }
 
   // 返回 List 的长度
@@ -53,10 +85,18 @@ fn main() {
   let mut list = List::new();
 
   // 追加一些元素
-  list = list.prepend(1);
-  list = list.prepend(2);
-  list = list.prepend(3);
+  // list = list.prepend(1);
+  // list = list.prepend(2);
+  // list = list.prepend(3);
+  // list = list.prepend(4);
+  // list = list.prepend(5);
+  // list = list.append(6);
 
+
+  list.append(1);
+  list.append(2);
+  list.append(3);
+  
   // 显示链表的最后状态
   println!("linked list has length: {}", list.len());
   println!("{}", list.stringify());

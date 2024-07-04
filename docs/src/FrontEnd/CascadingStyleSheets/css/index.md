@@ -115,3 +115,34 @@ export default {
 参考链接
 
 - [使用CSS绘制三角形](https://juejin.cn/post/7075884138900750372)
+
+
+### 文字悬浮下划线过渡效果
+
+鼠标悬浮显示下划线，下划线从左侧过渡至右侧，当鼠标移出时隐藏下划线，下划线从左侧过渡至右侧。
+
+
+```css
+span {
+  background: linear-gradient(to right, tomato 0%,tomato) no-repeat right bottom;
+  background-size: 0 2px;
+  transition: background-size 350ms;
+}
+span:hover{
+  background-size: 100% 2px;
+  background-position: left bottom;
+}
+```
+
+[示例页面 index12](/index12){target="_self"}
+[示例页面 underline](/underline){target="_self"}
+
+<script setup>
+import { useData } from 'vitepress'
+
+// params 是一个 Vue ref
+const { params } = useData()
+
+console.log(12)
+</script>
+
