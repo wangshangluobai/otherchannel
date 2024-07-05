@@ -134,15 +134,20 @@ span:hover{
 }
 ```
 
-[示例页面 index12](/index12){target="_self"}
-[示例页面 underline](/underline){target="_self"}
+::: details 样式演示
+<p>鼠标悬浮下列文字(抖动异常是VitePress渲染问题)</p>
+<span :class="$style.text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magni debitis non vitae voluptates et recusandae, ab, laborum nam eos incidunt error ullam asperiores aliquam, harum magnam laboriosam? Numquam porro possimus, obcaecati quam placeat laboriosam voluptatum. Consectetur magnam totam eaque doloribus tempora. Asperiores quo esse obcaecati accusantium incidunt adipisci nisi! Obcaecati maxime reprehenderit similique tempore ab!</span>
+:::
 
-<script setup>
-import { useData } from 'vitepress'
-
-// params 是一个 Vue ref
-const { params } = useData()
-
-console.log(12)
-</script>
+<style module>
+.text {
+  background: linear-gradient(to right, tomato 0%,tomato) no-repeat right bottom;
+  background-size: 0 2px;
+  transition: background-size 350ms;
+}
+.text:hover {
+  background-size: 100% 2px;
+  background-position: left bottom;
+}
+</style>
 

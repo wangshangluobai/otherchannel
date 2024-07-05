@@ -46,10 +46,20 @@ export default defineConfig({
   //     // md.use(markdownItFoo)
   //   },
   // },
+  // 资源基础文件路径-源文件
   srcDir: "src",
-  // outDir: "public",
-  // assetsDir: "static",
-  // // cacheDir: './cache'
+  // 为 URL 删除 .html 后缀
+  cleanUrls: true,
+  // 不作为源内容输出
+  srcExclude: ['**/README.md', '**/TODO.md'],
+  // 打包输出路径
+  // outDir: "./.vitepress/dist",
+  // 打包后的静态资源路径
+  // assetsDir: "static",,
+  // 缓存文件
+  // cacheDir: './cache',
+  // 是否启用深色模式
+  // appearance: true,
 })
 function nav(): DefaultTheme.NavItem[] {
   return [
