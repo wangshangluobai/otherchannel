@@ -49,3 +49,8 @@ import {mapState,mapGetters,mapMutations,mapActions} from "vuex"
 
  * mapState,mapGetters必须放在computed里面, mapMutations,mapActions必须放在methods里面
 ```
+### Vue 环境变量设置
+
+在配置文件中定义自定义变量时，一定以 VUE_APP_ 开头，否则 Vue 无法读取此变量
+
+- [Vue 环境变量设置](http://t.csdnimg.cn/fqVFE)
