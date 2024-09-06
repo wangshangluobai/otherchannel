@@ -1,4 +1,4 @@
-# 使用 SSH 链接本地与远程仓库
+## 使用 SSH 链接本地与远程仓库
 
 ```sh
 $ git init # 在 git bash 页面或者其他命令行页面初始化 git
@@ -65,3 +65,34 @@ $ git pull --rebase origin master
 知识引用
 
 - [原文链接](https://blog.csdn.net/qq_29493173/article/details/113094143)
+
+## 使用不同账号对应不同远程源
+
+在 C 盘找到 `C:\Users\{用户名}\.ssh` 根据 【使用 SSH 链接本地与远程仓库】步骤生成两个 SSH 密钥
+
+注意：密钥名称需要自己调整，不要混肴了
+
+接下来打开 .ssh 下的 config 文件，添加以下配置信息
+
+```text
+Host github.com   #这是一个别名
+    HostName github.com  # 这是远程仓库的域名 公司
+    User otherchannel
+    IdentityFile ~/.ssh/id_rsa_github   # 这个账号对应私钥的地址
+Host starshinetechs.com     #这是一个别名
+    HostName git.starshinetechs.com  # 这是远程仓库的域名 个人
+    User wangshangmin
+    IdentityFile ~/.ssh/id_rsa_gitlab  # 这个账号对应私钥的地址
+```
+
+调整 IdentityFile 值，对应生成好的私钥，调整 HostName 对应远程源域名或 IP
+
+将 SSH 添加到远程源的方法，根据 【使用 SSH 链接本地与远程仓库】实现
+
+注意：到此为止一切顺利的话，记录到远程源提交代码的名称是 `git config --global --unset user.name` 对应的值
+如果要调整，则需要单独为项目配置，不添加 --global 参数即可
+
+```sh
+git config user.name "x"
+git config user.email "x@x.com"
+```
