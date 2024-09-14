@@ -2,7 +2,22 @@
 
 1. [Vue 拖拽库](https://vue-draggable-plus.pages.dev/) B 站相关视频 **BV1pm411y7ru**
 
-### 冷门技巧
+### 技巧
+
+#### 在 Vue 中，动态添加 class
+
+1. 对象语法  
+   将一个对象传递给 class 绑定，对象的键是类名，值是一个布尔值，表示是否应该添加该类名  
+   `:class="{ 'active': isActive, 'disabled': isDisabled }"`
+2. 数组语法  
+    传递一个类名数组，数组中的每个项都将被添加到元素的 class 属性中
+   `:class="[isActive ? 'active' : '', isDisabled ? 'disabled' : '']"`
+3. 使用 class 绑定与计算属性  
+   需要根据多个条件动态添加 class 时，可以使用计算属性来简化模板  
+   `:class="classObject"`
+4. 使用方法动态添加 class  
+   在方法中返回一个对象或数组，然后在模板中使用该方法的结果  
+   `:class="getClasses()"`
 
 #### 重置 `Vue` 中 `data` 的数据为初始状态
 

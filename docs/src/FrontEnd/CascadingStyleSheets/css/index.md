@@ -113,6 +113,15 @@ W3C 中提到的边距重叠的几种情况：
 盒子的显示大小= border +content+padding+正 margin 值。负的 margin 值不会影响 box 的实际大小，  
 但是负的 top 或 left 值会引起 box 的向上或向左位置移动，如果是 bottom 或 right 只会影响下面 box 的显示的参考线
 
+什么时候用 margin，什么时候用 padding：
+
+- 何时应当使用 margin：需要在 border 外侧添加空白时。空白处不需要背景（色）时。上下相连的两个盒子之间的空白，需要相互抵消时。如 15px + 20px 的 margin，将得到 20px 的空白。
+- 何时应当时用 padding：需要在 border 内测添加空白时。空白处需要背景（色）时。上下相连的两个盒子之间的空白，希望等于两者之和时。如 15px + 20px 的 padding，将得到 35px 的空白。
+
+参考链接
+
+- [CSS 中 margin 重叠和一些相关概念](https://www.cnblogs.com/shenfangfang/p/5667848.html)
+
 ### CSS3 中如何解决子元素继承父元素的 opacity 属性
 
 css3 中的 opacity 属性是用来设置 div 元素的不透明级别的
