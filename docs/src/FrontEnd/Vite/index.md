@@ -188,6 +188,9 @@ import path from "path"
 // css 插件 自动添加 CSS3 前缀，px2rem，
 import autoprefixer from "autoprefixer"
 import postCssPxToRem from "postcss-pxtorem"
+// vite不支持commonjs的语法 `npm install @rollup/plugin-commonjs`
+// vite-plugin-commonjs官方已经说了只能在开发环境下使用
+import commonjs from "@rollup/plugin-commonjs"
 
 export default defineConfig(({ conditionalConfig }) => {
   // mode 对象包含4个字段
@@ -199,7 +202,10 @@ export default defineConfig(({ conditionalConfig }) => {
   // 需要返回一个对象
   return {
     // 插件配置
-    plugins: [vue()], // 默认配置vue插件
+    plugins: [
+      commonjs(), //要放在第一行,
+      vue(),
+    ], // 默认配置vue插件
     // 服务代理配置
     server: {
       host: "0.0.0.0", // 指定服务器应该监听哪个 IP 地址，默认localhost，可设置为'0.0.0.0'或 true
@@ -262,6 +268,19 @@ export default defineConfig(({ conditionalConfig }) => {
         ],
       },
     },
+    // 打包配置
+    build: {
+      minify: "terser", //启用terser压缩
+      // 设置为false，便不会出现源码，
+      sourcemap: false,
+      terserOptions: {
+        compress: {
+          //pure_funcs:['console'],//只清除console
+          drop_console: true, //清除所有console
+          drop_debugger: true, //清除所有drop_debugger
+        },
+      },
+    },
   }
 })
 ```
@@ -284,6 +303,12 @@ process.cwd() 和 \_\_dirname 用于获取文件系统路径的全局变量和�
 
 ```
 
+**在 js 文件中获取环境变量**
+
+```js
+import.meta.env.[key]
+```
+
 [更多命令行参考](https://cn.vitejs.dev/guide/cli.html)
 
 **服务代理**
@@ -296,3 +321,48 @@ host 默认值是 localhost，此时启动项目，只会监听本地服务
 Vite 的目标仅为现代浏览器，因此建议使用原生 CSS 变量和实现 CSSWG 草案的 PostCSS 插件（例如 postcss-nesting）来编写简单的、符合未来标准的 CSS  
 Vite 也同时提供了对 .scss, .sass, .less, .styl 和 .stylus 文件的内置支持,须安装相应的预处理器依赖  
 Vite 通过 postcss-import 预配置支持了 CSS @import 内联，在 CSS 文件中可以直接使用 @import 导入其他样式文件
+
+## Error
+
+### "Error: 'default' is not exported by..." when building with imported umd module
+
+**错误描述**
+
+```shell
+PS D:\PubFile\xx-xx-h5\dist> npm run build
+
+> xx-xx-h5@0.0.0 build
+> vite build
+
+vite v5.4.8 building for production...
+✓ 790 modules transformed.
+x Build failed in 9.83s
+error during build:
+node_modules/rollup-plugin-node-polyfills/polyfills/readable-stream/readable.js (8:8): "StringDecoder" is not exported by "node_modules/string_decoder/lib/string_decoder.js", imported by "node_modules/rollup-plugin-node-polyfills/polyfills/readable-stream/readable.js".
+file: D:/PubFile/xx-xx-h5/node_modules/rollup-plugin-node-polyfills/polyfills/readable-stream/readable.js:8:8
+
+ 6: import {inherits, debuglog} from 'util';
+ 7: import BufferList from './buffer-list';
+ 8: import {StringDecoder} from 'string_decoder';
+            ^
+ 9: import {Duplex} from './duplex';
+10: import {nextTick} from 'process';
+
+    at getRollupError (file:///D:/PubFile/xx-xx-h5/node_modules/rollup/dist/es/shared/parseAst.js:395:41)
+    at error (file:///D:/PubFile/xx-xx-h5/node_modules/rollup/dist/es/shared/parseAst.js:391:42)
+    ...
+```
+
+此错误在这次只出现在打包过程中，其原因大致是我引用了 node 环境中的东西，然后 commonJS 和 ES6 模块不兼容产生的影响。
+
+经过查阅各种资料，在 [Vite 的 issues](https://github.com/vitejs/vite/issues/2679) 中得到答案
+
+在 vite.config.js 中添加如下配置即可解决：
+
+```js
+build: {
+  commonjsOptions: {
+    include: ["eventemitter3"], // xgplayer 源码中引用了 node 环境中的模块，所以需要添加到 include 中
+  },
+},
+```

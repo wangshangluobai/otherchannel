@@ -1,3 +1,81 @@
+## javascript
+
+### JS 双击触发 2 次单击问题解决方案/js 区分单击和双击/连续点击事件
+
+开发过程中，我们可能会遇到单击（onclick）和双击（ondblclick）需要实现不同的交互效果。  
+当我们在同一个对象同时绑定了 onclick 和 ondblclick 事件，双击对象会执行 2 次单击事件和 1 次双击事件。
+
+1. 区分单双击事件
+   在单击事件设置一个定时器，执行双击时，不会马上执行定时器里的内容（比如，延时 500ms），继而先执行双击事件内容，在双击事件中清除了定时器，这样双击事件就不会触发单击事件中 setTimeout 里面的方法。从而实现了单击和双击事件的区分。
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+     <head>
+       <meta charset="UTF-8" />
+       <title>区分单双击</title>
+     </head>
+     <body>
+       <div>
+         <button onclick="clickFn()" ondblclick="dblClickFn()">点击</button>
+       </div>
+       <script>
+         let timer = null
+         function clickFn() {
+           clearTimeout(timer)
+           timer = setTimeout(function () {
+             console.log("单击")
+           }, 500)
+         }
+         function dblClickFn() {
+           clearTimeout(timer)
+           console.log("双击")
+         }
+       </script>
+     </body>
+   </html>
+   ```
+2. 实现连续点击事件
+   js 仅提供了单击（onclick）和双击（ondblclick）方法，并没有提供多次点击的方法。如果我们需要连击 n 次后再触发事件，则需要自己封装点击事件。通过记录用户的点击次数以及设置定时器去实现。
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+     <head>
+       <meta charset="UTF-8" />
+       <title>连击事件</title>
+     </head>
+     <body>
+       <div>
+         <button onclick="clickRepeatedly(5)">点击</button>
+       </div>
+       <script>
+         let count = 0,
+           timer
+         function clickRepeatedly(num) {
+           // num为设定触发事件的连击次数
+           if (count < num - 1) {
+             timer && clearTimeout(timer)
+             count++
+             console.log("count", count)
+             timer = setTimeout(function () {
+               count = 0
+             }, 300) // 间隔300ms以内才算连续点击
+           } else {
+             // 5次连击后触发
+             count = 0
+             clearTimeout(timer)
+             console.log("连续点击了5次")
+           }
+         }
+       </script>
+     </body>
+   </html>
+   ```
+
+### 报错 SyntaxError: Failed to execute ‘querySelector’ on ‘Document’: “xxx” is not a valid selector."
+
+原因：出现了数字为首的 `id` 形式，而 `querySelector` 不识别数字开头的命名，所以报错  
+解决方案：改用 `getElementById()` 即可 或者不适用数字开头命名
+
 ### base64 图片转二进制及图片上传
 
 1. 将 base64 转换为 二进制流
@@ -191,10 +269,7 @@
    */
   function getBase64(data) {
     let base64 = btoa(
-      new Uint8Array(data).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        ""
-      )
+      new Uint8Array(data).reduce((data, byte) => data + String.fromCharCode(byte), "")
     )
     return base64
   }
